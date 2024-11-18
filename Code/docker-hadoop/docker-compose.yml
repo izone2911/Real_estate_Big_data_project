@@ -1,0 +1,143 @@
+version: "3"
+
+services:
+  namenode:
+    image: haihp02/hadoop-namenode:latest
+    container_name: namenode
+    restart: always
+    ports:
+      - 9870:9870
+      - 10000:9000
+    volumes:
+      - ./hadoop/dfs/name:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+      
+    env_file:
+      - ./hadoop.env
+    networks:
+      - spark-hdfs-network
+
+  datanode1:
+    image: haihp02/hadoop-datanode:latest
+    container_name: datanode1
+    hostname: datanode1
+    restart: always
+    ports:
+      - 19866:19866
+      - 19864:19864
+    depends_on:
+      - namenode
+    volumes:
+      - ./hadoop/dfs/data1:/hadoop/dfs/data
+    environment:
+      - HDFS_CONF_dfs_datanode_address=0.0.0.0:19866
+      - HDFS_CONF_dfs_datanode_http_address=0.0.0.0:19864
+      - SERVICE_PRECONDITION=namenode:9870
+    env_file:
+      - ./hadoop.env
+    networks:
+      - spark-hdfs-network
+
+  datanode2:
+    image: haihp02/hadoop-datanode:latest
+    container_name: datanode2
+    hostname: datanode2
+    restart: always
+    ports:
+      - 29866:29866
+      - 29864:29864
+    depends_on:
+      - namenode
+    volumes:
+      - ./hadoop/dfs/data2:/hadoop/dfs/data
+    environment:
+      - HDFS_CONF_dfs_datanode_address=0.0.0.0:29866
+      - HDFS_CONF_dfs_datanode_http_address=0.0.0.0:29864
+      # - HDFS_CONF_dfs_datanode_rpc___address=192.168.1.6:29864
+      - SERVICE_PRECONDITION=namenode:9870
+    env_file:
+      - ./hadoop.env
+    networks:
+      - spark-hdfs-network
+
+  datanode3:
+    image: haihp02/hadoop-datanode:latest
+    container_name: datanode3
+    hostname: datanode3
+    restart: always
+    ports:
+      - 39866:39866
+      - 39864:39864
+    depends_on:
+      - namenode
+    volumes:
+      - ./hadoop/dfs/data3:/hadoop/dfs/data
+    environment:
+      - HDFS_CONF_dfs_datanode_address=0.0.0.0:39866
+      - HDFS_CONF_dfs_datanode_http_address=0.0.0.0:39864
+      # - HDFS_CONF_dfs_datanode_rpc___address=192.168.1.6:39864
+      - SERVICE_PRECONDITION=namenode:9870
+    env_file:
+      - ./hadoop.env
+    networks:
+      - spark-hdfs-network
+  
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
+    container_name: resourcemanager
+    restart: always
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode1:19864 datanode2:29864 datanode3:39864 datanode1:19866 datanode2:29866 datanode3:39866"
+    env_file:
+      - ./hadoop.env
+    networks:
+      - spark-hdfs-network
+
+  nodemanager1:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
+    container_name: nodemanager
+    restart: always
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode1:19864 datanode2:29864 datanode3:39864 datanode1:19866 datanode2:29866 datanode3:39866 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    networks:
+      - spark-hdfs-network
+  
+  historyserver:
+    image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
+    container_name: historyserver
+    restart: always
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode1:19864 datanode2:29864 datanode3:39864 datanode1:19866 datanode2:29866 datanode3:39866 resourcemanager:8088"
+    volumes:
+      - ./hadoop/yarn/timeline:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+    networks:
+      - spark-hdfs-network
+
+  hadoopconsumer:
+    image: haihp02/hadoop-consumer:latest
+    container_name: hadoopconsumer
+    restart: always
+    environment:
+      - NAMENODE_URL=http://namenode:9870
+      - HDFS_USER=haihp02
+      - BOOSTRAP_SERVERS=10.13.9.91:9192,10.13.9.91:9292,10.13.9.91:9392
+      - CONSUMER_GROUP_ID=test_now
+      - SUBSCRIBE_LIST=nhadatviet,bds,i-batdongsan
+      - POLL_TIMEOUT=0.1
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - datanode3
+    networks:
+      - spark-hdfs-network
+
+networks:
+  spark-hdfs-network:
+    name: spark-hdfs-network
+    driver: bridge

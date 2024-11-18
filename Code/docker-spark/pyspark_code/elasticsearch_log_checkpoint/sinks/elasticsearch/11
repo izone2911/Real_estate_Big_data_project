@@ -1,0 +1,5 @@
+v1
+{"taskId":0,"execTimeMillis":1704405252563,"resource":"haihp02_test_streaming_index","records":1}
+{"taskId":1,"execTimeMillis":1704405252876,"resource":"haihp02_test_streaming_index","records":5}
+{"taskId":2,"execTimeMillis":1704405253179,"resource":"haihp02_test_streaming_index","records":2}
+{"taskId":3,"execTimeMillis":1704405253500,"resource":"haihp02_test_streaming_index","records":1}

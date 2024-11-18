@@ -1,0 +1,8 @@
+v1
+{"taskId":0,"execTimeMillis":1704405241280,"resource":"haihp02_test_streaming_index","records":3}
+{"taskId":1,"execTimeMillis":1704405241631,"resource":"haihp02_test_streaming_index","records":1}
+{"taskId":2,"execTimeMillis":1704405241955,"resource":"haihp02_test_streaming_index","records":3}
+{"taskId":3,"execTimeMillis":1704405242273,"resource":"haihp02_test_streaming_index","records":4}
+{"taskId":4,"execTimeMillis":1704405242604,"resource":"haihp02_test_streaming_index","records":3}
+{"taskId":5,"execTimeMillis":1704405242926,"resource":"haihp02_test_streaming_index","records":1}
+{"taskId":6,"execTimeMillis":1704405243318,"resource":"haihp02_test_streaming_index","records":2}
